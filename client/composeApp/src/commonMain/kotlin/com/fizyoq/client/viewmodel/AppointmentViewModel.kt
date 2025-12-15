@@ -6,10 +6,9 @@ import androidx.compose.runtime.setValue
 import com.fizyoq.client.model.Appointment
 import com.fizyoq.client.model.AppointmentStatus
 
-
 class AppointmentViewModel {
     var appointments by mutableStateOf<List<Appointment>>(emptyList())
-    private set
+        private set
 
     init {
         loadMockData()
@@ -23,16 +22,17 @@ class AppointmentViewModel {
         )
     }
 
-    fun getPatientDisplayList(): List<Appointment>{
+    fun getPatientDisplayList(): List<Appointment> {
         return appointments.map { randevu ->
-            randevu.copy(patientName = maskName(randevu.patientName))
+            randevu.copy(
+                patientName = maskName(randevu.patientName)
+            )
         }
     }
 
     private fun maskName(fullName: String): String {
         return fullName.split(" ").joinToString(" ") { word ->
-            if (word.isNotEmpty()) "${word.first()}*****" else ""
+            if (word.isNotEmpty()) "${word.first()}****" else ""
         }
     }
 }
-

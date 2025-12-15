@@ -1,0 +1,15 @@
+from pydantic import BaseModel
+
+
+class PatientBase(BaseModel):
+    full_name:str
+    reservation_time:str
+    status:str = "Bekliyor"
+
+class PatientCreate(PatientBase):
+    pass
+
+class Patient(PatientBase):
+    id: int
+    class Config:
+        from_attributes = True
