@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
-
 class PatientBase(BaseModel):
-    full_name:str
-    reservation_time:str
-    status:str = "Bekliyor"
+    full_name: str
+    physiotherapist: str
+    reservation_time: str
+    status: str = "Bekliyor"
 
 class PatientCreate(PatientBase):
     pass

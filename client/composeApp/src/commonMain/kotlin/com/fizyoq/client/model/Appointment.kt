@@ -1,21 +1,34 @@
 package com.fizyoq.client.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 @Serializable
 data class Appointment (
-    val id: String,
-    val patientName: String,
-    val treatmentType: String,
-    val date: String,
-    val timeSlot: String,
-    val status: AppointmentStatus = AppointmentStatus.PENDING,
-    val notes: String? = null
+    val id: Int,
 
+    @SerialName("full_name")
+    val patientName: String,
+
+    @SerialName("physiotherapist")
+    val physiotherapist: String,
+
+    @SerialName("reservation_time")
+    val timeSlot: String,
+
+    val status: String = "Bekliyor"
 )
+
 @Serializable
-enum class AppointmentStatus {
-    PENDING,
-    COMPLETED,
-    CANCELLED
-}
+data class  AppointmentRequest(
+    @SerialName("full_name")
+    val patientName: String,
+
+    @SerialName("physiotherapist")
+    val physiotherapist: String,
+
+    @SerialName("reservation_time")
+    val timeSlot: String,
+
+    val status: String = "Bekliyor"
+)

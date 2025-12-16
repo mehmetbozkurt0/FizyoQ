@@ -4,22 +4,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.fizyoq.client.model.Appointment
-import com.fizyoq.client.model.AppointmentStatus
+import com.fizyoq.client.model.AppointmentRequest
+import com.fizyoq.client.network.FizyoApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 
 class AppointmentViewModel {
     var appointments by mutableStateOf<List<Appointment>>(emptyList())
         private set
 
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     init {
-        loadMockData()
+        fetchAppointments()
     }
 
-    private fun loadMockData() {
-        appointments = listOf(
-            Appointment("1", "Ahmet Yılmaz", "Manuel Terapi", "2023-10-27", "14:00"),
-            Appointment("2", "Ayşe Demir", "Kuru İğneleme", "2023-10-27", "15:00", AppointmentStatus.COMPLETED),
-            Appointment("3", "Mehmet Kaya", "Kupa Terapisi", "2023-10-27", "16:00", AppointmentStatus.CANCELLED)
-        )
+    fun fetchAppointments() {
+        scope.launch {
+            try {
+                appointments = FizyoApi.getPatients()
+            }
+            catch (e: Exception) {
+                println("API Hatası: ${e.message}")
+                e.printStackTrace()
+            }
+        }
     }
 
     fun getPatientDisplayList(): List<Appointment> {
@@ -27,6 +38,24 @@ class AppointmentViewModel {
             randevu.copy(
                 patientName = maskName(randevu.patientName)
             )
+        }
+    }
+
+    fun addAppointment(name: String, fzt: String, time: String) {
+        scope.launch {
+            try {
+                val newAppointment = AppointmentRequest(
+                    patientName = name,
+                    physiotherapist = fzt,
+                    timeSlot = time
+                )
+
+                FizyoApi.addPatient(newAppointment)
+                fetchAppointments()
+            }
+            catch (e: Exception) {
+                println("Ekleme Hatası: ${e.message}")
+            }
         }
     }
 

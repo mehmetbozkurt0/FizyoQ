@@ -19,11 +19,11 @@ fun main() = application {
         title = "FizyoQ - Yönetici Paneli",
         state = rememberWindowState(
             position = WindowPosition(Alignment.Center),
-            size = DpSize(800.dp, 600.dp)
+            size = DpSize(1000.dp, 700.dp)
         )
     ) {
         AppointmentTable(
-            appointments = viewModel.appointments,
+            viewModel = viewModel,
             isAdmin = true
         )
     }
@@ -34,13 +34,13 @@ fun main() = application {
         state = rememberWindowState(
 
             position = WindowPosition(x = 100.dp, y = 100.dp),
-            size = DpSize(600.dp, 800.dp)
+            size = DpSize(800.dp, 600.dp)
         )
     ) {
         val maskedList = viewModel.getPatientDisplayList()
 
         AppointmentTable(
-            appointments = maskedList,
+            viewModel = viewModel,
             isAdmin = false
         )
     }
