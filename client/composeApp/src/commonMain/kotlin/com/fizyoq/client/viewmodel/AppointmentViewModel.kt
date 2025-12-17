@@ -59,6 +59,35 @@ class AppointmentViewModel {
         }
     }
 
+    fun deleteAppointment(id: Int) {
+        scope.launch {
+            try {
+                FizyoApi.deletePatient(id)
+                fetchAppointments()
+            }
+            catch (e: Exception) {
+                println("Silme hatası: ${e.message}")
+            }
+        }
+    }
+
+    fun updateAppointment(id: Int, name: String, fzt: String, time: String, status: String) {
+        scope.launch {
+            try {
+                val updateRequest = AppointmentRequest(
+                    patientName = name,
+                    physiotherapist = fzt,
+                    timeSlot = time,
+                    status = status
+                )
+                FizyoApi.updatePatient(id, updateRequest)
+                fetchAppointments()
+            } catch (e: Exception) {
+                println("Güncelleme Hatası: ${e.message}")
+            }
+        }
+    }
+
     private fun maskName(fullName: String): String {
         return fullName.split(" ").joinToString(" ") { word ->
             if (word.isNotEmpty()) "${word.first()}****" else ""

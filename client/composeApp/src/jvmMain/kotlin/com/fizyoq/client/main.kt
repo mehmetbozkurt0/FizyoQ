@@ -34,7 +34,7 @@ fun main() = application {
         state = rememberWindowState(
 
             position = WindowPosition(x = 100.dp, y = 100.dp),
-            size = DpSize(800.dp, 600.dp)
+            size = DpSize(1000.dp, 700.dp)
         )
     ) {
         val maskedList = viewModel.getPatientDisplayList()

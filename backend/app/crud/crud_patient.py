@@ -28,3 +28,18 @@ def update_status(db: Session, patient_id: int, new_status: str):
 def delete_all(db: Session):
     db.query(models.PatientDB).delete()
     db.commit()
+
+def delete_patient (db: Session, patient_id: int):
+    db.query(models.PatientDB).filter(models.PatientDB.id == patient_id).delete()
+    db.commit()
+
+def update_patient(db: Session, patient_id: int, patient_data: schemas.PatientUpdate):
+    db_patient = db.query(models.PatientDB).filter(models.PatientDB.id == patient_id).first()
+    if db_patient:
+        db_patient.full_name = patient_data.full_name
+        db_patient.physiotherapist = patient_data.physiotherapist
+        db_patient.reservation_time = patient_data.reservation_time
+        db_patient.status = patient_data.status
+        db.commit()
+        db.refresh(db_patient)
+    return db_patient
