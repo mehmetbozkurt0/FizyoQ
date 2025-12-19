@@ -96,9 +96,16 @@ compose.desktop {
         mainClass = "com.fizyoq.client.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.fizyoq.client"
+            targetFormats(org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi)
+            packageName = "FizyoQ"
             packageVersion = "1.0.0"
+
+            windows {
+                shortcut = true
+                menu = true
+                menuGroup = "FizyoQ-Daily Planner"
+                upgradeUuid = "550e8400-e29b-41d4-a716-446655440000"
+            }
         }
     }
 }
