@@ -16,11 +16,21 @@ def get_db():
         db.close()
 
 @router.get("/", response_model=List[schemas.Patient])
-async def read_patients(db: Session = Depends(get_db)):
-    return crud_patient.get_patients(db)
+async def read_patients(date: str, db: Session = Depends(get_db)):
+    return crud_patient.get_patients(date=date, db=db)
     
 @router.post("/", response_model=schemas.Patient)
 async def create_patient(patient: schemas.PatientCreate, db: Session = Depends(get_db)):
+    existing_appointment = crud_patient.get_appointment_by_fzt(
+        db,
+        fzt=patient.physiotherapist,
+        time=patient.reservation_time,
+        date=patient.date
+    )
+
+    if existing_appointment:
+        raise HTTPException(status_code=400, detail="Bu saatte randevu zaten dolu!")
+
     return crud_patient.create_patient(db=db, patient=patient)
 
 @router.put("/{patient_id}", response_model=schemas.Patient)

@@ -4,6 +4,7 @@ class PatientBase(BaseModel):
     full_name: str
     physiotherapist: str
     reservation_time: str
+    date: str
     status: str = "Bekliyor"
 
 class PatientCreate(PatientBase):
@@ -18,4 +19,5 @@ class PatientUpdate(BaseModel):
     full_name: str
     physiotherapist: str
     reservation_time: str
+    date: str
     status: str

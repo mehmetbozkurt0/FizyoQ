@@ -8,4 +8,5 @@ class PatientDB(Base):
     full_name = Column(String, index=False)
     physiotherapist = Column(String)
     reservation_time = Column(String)
+    date = Column(String)
     status = Column(String, default="Bekliyor")

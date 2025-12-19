@@ -32,9 +32,9 @@ object  FizyoApi {
 
     private val BASE_URL = getPlatform().baseUrl
 
-    suspend fun getPatients(): List<Appointment> {
+    suspend fun getPatients(date: String): List<Appointment> {
         println("İstek atılıyor: $BASE_URL/patients/")
-        return client.get("$BASE_URL/patients/").body()
+        return client.get("$BASE_URL/patients/?date=$date").body()
     }
 
     suspend fun addPatient(request: AppointmentRequest) {

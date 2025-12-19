@@ -10,10 +10,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.datetime.*
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.number
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class AppointmentViewModel {
     var appointments by mutableStateOf<List<Appointment>>(emptyList())
         private set
+
+    var selectedDate by mutableStateOf<LocalDate>(
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    )
+        private set
+
+    val formattedDate: String
+        get() = "${selectedDate.day} ${getTurkishMonthName(selectedDate.month.number)} ${selectedDate.year}"
+
+    private val apiDateFormat: String
+        get() = selectedDate.toString()
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -21,52 +38,44 @@ class AppointmentViewModel {
         fetchAppointments()
     }
 
+    fun nextDay() {
+        selectedDate = selectedDate.plus(DatePeriod(days = 1))
+        fetchAppointments()
+    }
+
+    fun previousDay() {
+        selectedDate = selectedDate.minus(DatePeriod(days = 1))
+        fetchAppointments()
+    }
+
+    fun goToday() {
+        selectedDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        fetchAppointments()
+    }
+
     fun fetchAppointments() {
         scope.launch {
             try {
-                appointments = FizyoApi.getPatients()
-            }
-            catch (e: Exception) {
+                appointments = FizyoApi.getPatients(apiDateFormat)
+            } catch (e: Exception) {
                 println("API Hatası: ${e.message}")
-                e.printStackTrace()
             }
-        }
-    }
-
-    fun getPatientDisplayList(): List<Appointment> {
-        return appointments.map { randevu ->
-            randevu.copy(
-                patientName = maskName(randevu.patientName)
-            )
         }
     }
 
     fun addAppointment(name: String, fzt: String, time: String) {
         scope.launch {
             try {
-                val newAppointment = AppointmentRequest(
+                val newReq = AppointmentRequest(
                     patientName = name,
                     physiotherapist = fzt,
-                    timeSlot = time
+                    timeSlot = time,
+                    date = apiDateFormat
                 )
-
-                FizyoApi.addPatient(newAppointment)
+                FizyoApi.addPatient(newReq)
                 fetchAppointments()
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 println("Ekleme Hatası: ${e.message}")
-            }
-        }
-    }
-
-    fun deleteAppointment(id: Int) {
-        scope.launch {
-            try {
-                FizyoApi.deletePatient(id)
-                fetchAppointments()
-            }
-            catch (e: Exception) {
-                println("Silme hatası: ${e.message}")
             }
         }
     }
@@ -78,7 +87,8 @@ class AppointmentViewModel {
                     patientName = name,
                     physiotherapist = fzt,
                     timeSlot = time,
-                    status = status
+                    status = status,
+                    date = apiDateFormat
                 )
                 FizyoApi.updatePatient(id, updateRequest)
                 fetchAppointments()
@@ -88,9 +98,32 @@ class AppointmentViewModel {
         }
     }
 
+    fun deleteAppointment(id: Int) {
+        scope.launch {
+            try {
+                FizyoApi.deletePatient(id)
+                fetchAppointments()
+            } catch (e: Exception) {
+                println("Silme Hatası: ${e.message}")
+            }
+        }
+    }
+
+    fun getPatientDisplayList(): List<Appointment> {
+        return appointments.map { it.copy(patientName = maskName(it.patientName)) }
+    }
+
     private fun maskName(fullName: String): String {
         return fullName.split(" ").joinToString(" ") { word ->
             if (word.isNotEmpty()) "${word.first()}****" else ""
+        }
+    }
+
+    private fun getTurkishMonthName(month: Int): String {
+        return when (month) {
+            1 -> "Ocak"; 2 -> "Şubat"; 3 -> "Mart"; 4 -> "Nisan"; 5 -> "Mayıs"; 6 -> "Haziran"
+            7 -> "Temmuz"; 8 -> "Ağustos"; 9 -> "Eylül"; 10 -> "Ekim"; 11 -> "Kasım"; 12 -> "Aralık"
+            else -> ""
         }
     }
 }

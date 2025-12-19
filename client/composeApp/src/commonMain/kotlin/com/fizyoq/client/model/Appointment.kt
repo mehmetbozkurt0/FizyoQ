@@ -16,6 +16,9 @@ data class Appointment (
     @SerialName("reservation_time")
     val timeSlot: String,
 
+    @SerialName("date")
+    val date: String,
+
     val status: String = "Bekliyor"
 )
 
@@ -29,6 +32,9 @@ data class  AppointmentRequest(
 
     @SerialName("reservation_time")
     val timeSlot: String,
+
+    @SerialName("date")
+    val date: String,
 
     val status: String = "Bekliyor"
 )
