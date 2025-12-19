@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import com.fizyoq.client.model.Appointment
 import com.fizyoq.client.model.AppointmentRequest
 import com.fizyoq.client.network.FizyoApi
+import com.fizyoq.client.model.Physiotherapist
+import com.fizyoq.client.model.PhysiotherapistRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -32,10 +34,48 @@ class AppointmentViewModel {
     private val apiDateFormat: String
         get() = selectedDate.toString()
 
+    var physiotherapist by mutableStateOf<List<Physiotherapist>>(emptyList())
+        private set
+
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
+        fetchPhysiotherapists()
         fetchAppointments()
+    }
+
+    fun fetchPhysiotherapists() {
+        scope.launch {
+            try {
+                physiotherapist = FizyoApi.getPhysiotherapists()
+            }
+            catch (e: Exception) {
+                println("Fzt. Çekilemedi: ${e.message}")
+            }
+        }
+    }
+
+    fun addPhysiotherapist(name: String) {
+        scope.launch {
+            try {
+                FizyoApi.addPhysiotherapist(PhysiotherapistRequest(name))
+                fetchPhysiotherapists() // Listeyi tazele
+            } catch (e: Exception) {
+                println("Fizyoterapist Ekleme Hatası: ${e.message}")
+            }
+        }
+    }
+
+    fun deletePhysiotherapist(id: Int) {
+        scope.launch {
+            try {
+                FizyoApi.deletePhysiotherapist(id)
+                fetchPhysiotherapists()
+                fetchAppointments()
+            } catch (e: Exception) {
+                println("Fizyoterapist Silme Hatası: ${e.message}")
+            }
+        }
     }
 
     fun nextDay() {
@@ -80,7 +120,7 @@ class AppointmentViewModel {
         }
     }
 
-    fun updateAppointment(id: Int, name: String, fzt: String, time: String, status: String) {
+    fun updateAppointment(id: Int, name: String, fzt: String, time: String, status: String, date: String) {
         scope.launch {
             try {
                 val updateRequest = AppointmentRequest(
@@ -88,7 +128,7 @@ class AppointmentViewModel {
                     physiotherapist = fzt,
                     timeSlot = time,
                     status = status,
-                    date = apiDateFormat
+                    date = date
                 )
                 FizyoApi.updatePatient(id, updateRequest)
                 fetchAppointments()

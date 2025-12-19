@@ -38,3 +38,14 @@ data class  AppointmentRequest(
 
     val status: String = "Bekliyor"
 )
+
+@Serializable
+data class Physiotherapist(
+    val id: Int,
+    val name: String
+)
+
+@Serializable
+data class PhysiotherapistRequest(
+    val name: String
+)

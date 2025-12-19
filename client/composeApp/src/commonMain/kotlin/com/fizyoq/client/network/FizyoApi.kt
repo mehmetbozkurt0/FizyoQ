@@ -17,6 +17,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import com.fizyoq.client.model.Physiotherapist
+import com.fizyoq.client.model.PhysiotherapistRequest
+
 
 object  FizyoApi {
     private val client = HttpClient {
@@ -53,5 +56,20 @@ object  FizyoApi {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
+    }
+
+    suspend fun getPhysiotherapists(): List<Physiotherapist> {
+        return client.get("$BASE_URL/physiotherapists/").body()
+    }
+
+    suspend fun addPhysiotherapist(request: PhysiotherapistRequest) {
+        client.post("$BASE_URL/physiotherapists/") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+    }
+
+    suspend fun deletePhysiotherapist(id: Int) {
+        client.delete("$BASE_URL/physiotherapists/$id")
     }
 }
